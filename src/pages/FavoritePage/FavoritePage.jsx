@@ -81,6 +81,7 @@ const FavoritePage = () => {
                 <CharacterModal
                     character={selectedCharacter}
                     onClose={handleCloseModal}
+                    isFavoritePage={true}
                 />
             )}
         </div>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebaseConfig";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, deleteDoc } from "firebase/firestore";
 
-const CharacterModal = ({ character, onClose }) => {
+const CharacterModal = ({ character, onClose, isFavoritePage }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(character.isFavorite || false);
   const [translateX, setTranslateX] = useState(0);
@@ -21,15 +21,23 @@ const CharacterModal = ({ character, onClose }) => {
   }, [character.images]);
 
   const handleFavorite = async () => {
-    setIsFavorite(!isFavorite);
-  
-    if (!isFavorite) {
+    if (isFavoritePage) {
+      try {
+        const docRef = doc(db, 'favoritos', character.id.toString());
+        await deleteDoc(docRef);
+        console.log("Personaje eliminado de favoritos:", character.name);
+        onClose();
+      } catch (error) {
+        console.error("Error al eliminar de favoritos:", error);
+      }
+    } else {
+      setIsFavorite(true);
       const characterData = {
         name: character.name,
         birthdate: character.personal.birthdate,
         characterId: character.id,
       };
-  
+
       try {
         const docRef = doc(db, 'favoritos', character.id.toString());
         await setDoc(docRef, characterData);
@@ -72,7 +80,7 @@ const CharacterModal = ({ character, onClose }) => {
           onClick={handleFavorite}
           className={`py-2 px-4 rounded-md text-white ${isFavorite ? "bg-red-500" : "bg-gray-500"}`}
         >
-          {isFavorite ? "Añadido a Favoritos" : "Añadir a Favoritos"}
+          {isFavoritePage ? "Eliminar de Favoritos" : "Añadir a Favoritos"}
         </button>
       </div>
     </div>

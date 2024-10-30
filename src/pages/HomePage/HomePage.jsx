@@ -57,6 +57,7 @@ const HomePage = () => {
         <CharacterModal
           character={selectedCharacter}
           onClose={() => setShowModal(false)}
+          isFavoritePage={false}
         />
       )}
     </>
